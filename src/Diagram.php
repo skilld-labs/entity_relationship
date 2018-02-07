@@ -70,11 +70,36 @@ class Diagram {
     $this->graph = [];
     $entities = [];
     $entity_refs = [];
+    $bundles_info = [];
 
     if ($entity_types) {
       foreach ($entity_types as $item) {
         $entities[$item] = $this->entityTypeManager->getDefinition($item);
+        // Generate the bundles.
+        $bundle_entity_name = $entities[$item]->getBundleEntityType();
+        if (!empty($bundle_entity_name)) {
+          $bundles = $this->entityTypeManager->getStorage($bundle_entity_name)->loadMultiple();
+          $bundles = array_map(function (EntityInterface $bundle_entity) {
+            return $bundle_entity->label();
+          }, $bundles);
+        }
+        elseif ($entities[$item]->hasHandlerClass('bundle_plugin')) {
+          $bundle_handler = $this->entityTypeManager->getHandler($item, 'bundle_plugin');
+          $bundles = array_map(function (array $definition) {
+            return $definition['label'];
+          }, $bundle_handler->getBundleInfo());
+          unset($bundle_handler);
+        }
+        else {
+          $bundles = [
+            $item => (string) $entities[$item]->getLabel(),
+          ];
+        }
+        $bundles_info[$item] = $bundles;
+        unset($bundles);
+        unset($bundle_entity_name);
       }
+      unset($item);
     }
 
     foreach ($entities as $entity_type => $entity) {
@@ -86,31 +111,12 @@ class Diagram {
 
       $base_table = $entity->getBaseTable();
       if (!empty($base_table)) {
-
-        // Generate the bundles.
-        $bundle_entity_name = $entity->getBundleEntityType();
-        if (!empty($bundle_entity_name)) {
-          $bundles = $this->entityTypeManager->getStorage($bundle_entity_name)->loadMultiple();
-          $bundles = array_map(function (EntityInterface $bundle_entity) {
-            return $bundle_entity->label();
-          }, $bundles);
-        }
-        elseif ($entity->hasHandlerClass('bundle_plugin')) {
-          $bundle_handler = $this->entityTypeManager->getHandler($entity->id(), 'bundle_plugin');
-          $bundles = array_map(function (array $definition) {
-            return $definition['label'];
-          }, $bundle_handler->getBundleInfo());
-        }
-        else {
-          $bundles = [
-            $entity->id() => $entity->getLabel(),
-          ];
-        }
+        $bundles = $bundles_info[$entity->id()];
         $cluster_entity_group_name = 'cluster_entity_group_' . $entity_type;
 
         if (!empty($bundles)) {
           foreach ($bundles as $bundle_name => $bundle_label) {
-            $this->graph['entities'][$cluster_entity_group_name]['entity_' . $entity_type . '__bundle_' . str_replace('-', '_', $bundle_name)] = [
+            $this->graph['entities'][$cluster_entity_group_name]['entity_' . $entity_type . '__bundle_' . $bundle_name] = [
               'title' => $bundle_label,
             ];
           }
@@ -130,7 +136,18 @@ class Diagram {
                 $reference_definition = $instance_info->getItemDefinition()->getSettings();
                 $reference_target_type = $reference_definition['target_type'];
                 if (!empty($reference_definition['handler_settings']['target_bundles'])) {
-                  foreach ($reference_definition['handler_settings']['target_bundles'] as $target_bundle) {
+                  $target_bundles = $reference_definition['handler_settings']['target_bundles'];
+                }
+                elseif (isset($bundles_info[$reference_target_type])) {
+                  $target_bundles = array_keys($bundles_info[$reference_target_type]);
+                }
+                else {
+                  $target_bundles = [];
+                }
+
+                if (!empty($target_bundles)) {
+                  $stop = null;
+                  foreach ($target_bundles as $target_bundle) {
                     $entity_refs[$entity->id()][$bundle_name][$field_name][$reference_target_type] = [
                       'bundle' => $target_bundle,
                       'cardinality' => $instance_info->getFieldStorageDefinition()->getCardinality(),
@@ -139,10 +156,6 @@ class Diagram {
                     ];
                   }
                 }
-                else {
-                  $stop = null;
-                }
-                $stop = null;
               }
 
               $this->graph['entities'][$cluster_entity_group_name]['entity_' . $entity_type . '__bundle_' . $bundle_name]['fields'][$field_name] = $field_property_info;
