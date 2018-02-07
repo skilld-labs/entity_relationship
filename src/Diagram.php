@@ -70,7 +70,6 @@ class Diagram {
     $this->graph = [];
     $entities = [];
     $entity_refs = [];
-    $this->entityReferenceConnections($entity_refs);
 
     if ($entity_types) {
       foreach ($entity_types as $item) {
@@ -87,14 +86,6 @@ class Diagram {
 
       $base_table = $entity->getBaseTable();
       if (!empty($base_table)) {
-        $base_field_definitions = $this->entityFieldManager->getBaseFieldDefinitions($entity_type);
-        if (!empty($base_field_definitions)) {
-          foreach ($base_field_definitions as $field_name => $field_info) {
-            $entity_info['properties'][$field_name] = [
-              'type' => $field_info->getDataType(),
-            ];
-          }
-        }
 
         // Generate the bundles.
         $bundle_entity_name = $entity->getBundleEntityType();
@@ -115,10 +106,11 @@ class Diagram {
             $entity->id() => $entity->getLabel(),
           ];
         }
+        $cluster_entity_group_name = 'cluster_entity_group_' . $entity_type;
 
         if (!empty($bundles)) {
           foreach ($bundles as $bundle_name => $bundle_label) {
-            $this->graph['entities']['cluster_entity_group_' . $entity_type]['entity_' . $entity_type . '__bundle_' . str_replace('-', '_', $bundle_name)] = [
+            $this->graph['entities'][$cluster_entity_group_name]['entity_' . $entity_type . '__bundle_' . str_replace('-', '_', $bundle_name)] = [
               'title' => $bundle_label,
             ];
           }
@@ -134,11 +126,30 @@ class Diagram {
                 $field_property_info['type'] = 'list<' . $field_property_info['type'] . '>';
               }
 
-              $this->graph['entities']['cluster_entity_group_' . $entity_type]['entity_' . $entity_type . '__bundle_' . $bundle_name]['fields'][$field_name] = $field_property_info;
+              if ($instance_info->getType() == 'entity_reference' || $instance_info->getType() == 'entity_reference_revisions') {
+                $reference_definition = $instance_info->getItemDefinition()->getSettings();
+                $reference_target_type = $reference_definition['target_type'];
+                if (!empty($reference_definition['handler_settings']['target_bundles'])) {
+                  foreach ($reference_definition['handler_settings']['target_bundles'] as $target_bundle) {
+                    $entity_refs[$entity->id()][$bundle_name][$field_name][$reference_target_type] = [
+                      'bundle' => $target_bundle,
+                      'cardinality' => $instance_info->getFieldStorageDefinition()->getCardinality(),
+                      'required' => $instance_info->isRequired(),
+                      'fieldname' => $field_name,
+                    ];
+                  }
+                }
+                else {
+                  $stop = null;
+                }
+                $stop = null;
+              }
+
+              $this->graph['entities'][$cluster_entity_group_name]['entity_' . $entity_type . '__bundle_' . $bundle_name]['fields'][$field_name] = $field_property_info;
             }
           }
         }
-        $group = &$this->graph['entities']['cluster_entity_group_' . $entity_type];
+        $group = &$this->graph['entities'][$cluster_entity_group_name];
         $group['label'] = $entity->getLabel();
         $group['group'] = TRUE;
       }
@@ -150,43 +161,6 @@ class Diagram {
             foreach ($target as $target_type => $target_info) {
               $relationship = 'entity_' . $target_type . '__bundle_' . $target_info['bundle'];
               $this->setRelationship('entity_' . $entity_type . '__bundle_' . $bundle_name, $relationship, $target_info['required'], $target_info['cardinality'], $target_info['fieldname']);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * Get entity reference connections.
-   *
-   * @param array $field_relation
-   *   Field relationship data.
-   */
-  private function entityReferenceConnections(array &$field_relation) {
-    $entity_reference_map = $this->entityFieldManager->getFieldMapByFieldType('entity_reference');
-
-    foreach ($entity_reference_map as $type_referencing => $entity_reference_fields) {
-      foreach ($entity_reference_fields as $field_name => $map_info) {
-        $field_storage_info = FieldStorageConfig::loadByName($type_referencing, $field_name);
-        if (empty($field_storage_info)) {
-          continue;
-        }
-
-        $bundle_referencing = reset($map_info['bundles']);
-        $type_referenced = $field_storage_info->getSetting('target_type');
-
-        $field_info = FieldConfig::loadByName($type_referencing, $bundle_referencing, $field_name);
-        if (!empty($field_info->getSetting('handler_settings'))) {
-          if (isset($field_info->getSetting('handler_settings')['target_bundles'])) {
-            $target_bundles = $field_info->getSetting('handler_settings')['target_bundles'];
-            foreach ($target_bundles as $target_bundle) {
-              $field_relation[$type_referencing][$bundle_referencing][$field_name][$type_referenced] = [
-                'bundle' => $target_bundle,
-                'cardinality' => $field_storage_info->getCardinality(),
-                'required' => $field_info->isRequired(),
-                'fieldname' => $field_name,
-              ];
             }
           }
         }
