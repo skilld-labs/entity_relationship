@@ -3,6 +3,7 @@
 namespace Drupal\entity_relationship;
 
 use Drupal\Core\Entity\ContentEntityType;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\field\Entity\FieldConfig;
@@ -99,18 +100,29 @@ class Diagram {
         $bundle_entity_name = $entity->getBundleEntityType();
         if (!empty($bundle_entity_name)) {
           $bundles = $this->entityTypeManager->getStorage($bundle_entity_name)->loadMultiple();
+          $bundles = array_map(function (EntityInterface $bundle_entity) {
+            return $bundle_entity->label();
+          }, $bundles);
+        }
+        elseif ($entity->hasHandlerClass('bundle_plugin')) {
+          $bundle_handler = $this->entityTypeManager->getHandler($entity->id(), 'bundle_plugin');
+          $bundles = array_map(function (array $definition) {
+            return $definition['label'];
+          }, $bundle_handler->getBundleInfo());
         }
         else {
-          $bundles = [];
+          $bundles = [
+            $entity->id() => $entity->getLabel(),
+          ];
         }
 
         if (!empty($bundles)) {
-          foreach ($bundles as $bundle_name => $bundle_info) {
+          foreach ($bundles as $bundle_name => $bundle_label) {
             $this->graph['entities']['cluster_entity_group_' . $entity_type]['entity_' . $entity_type . '__bundle_' . str_replace('-', '_', $bundle_name)] = [
-              'title' => $bundle_info->label(),
+              'title' => $bundle_label,
             ];
           }
-          foreach ($bundles as $bundle_name => $bundle_info) {
+          foreach ($bundles as $bundle_name => $bundle_label) {
             $instances = $this->entityFieldManager->getFieldDefinitions($entity_type, $bundle_name);
             foreach ($instances as $field_name => $instance_info) {
               $field_property_info = [
