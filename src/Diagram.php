@@ -104,7 +104,6 @@ class Diagram {
           $bundles = [];
         }
 
-        $fields = [];
         if (!empty($bundles)) {
           foreach ($bundles as $bundle_name => $bundle_info) {
             $this->graph['entities']['cluster_entity_group_' . $entity_type]['entity_' . $entity_type . '__bundle_' . str_replace('-', '_', $bundle_name)] = [
@@ -114,26 +113,15 @@ class Diagram {
           foreach ($bundles as $bundle_name => $bundle_info) {
             $instances = $this->entityFieldManager->getFieldDefinitions($entity_type, $bundle_name);
             foreach ($instances as $field_name => $instance_info) {
-              $fields[$field_name][] = $bundle_name;
-            }
-          }
+              $field_property_info = [
+                'label' => $field_name,
+                'type' => $instance_info->getType(),
+              ];
 
-          foreach ($fields as $field_name => $bundles) {
-            $field_info = FieldStorageConfig::loadByName($entity_type, $field_name);
-            if (empty($field_info)) {
-              continue;
-            }
+              if ($instance_info->getFieldStorageDefinition()->getCardinality() != 1) {
+                $field_property_info['type'] = 'list<' . $field_property_info['type'] . '>';
+              }
 
-            $field_property_info = [
-              'label' => $field_name,
-              'type' => $field_info->getType(),
-            ];
-
-            if ($field_info->getCardinality() != 1) {
-              $field_property_info['type'] = 'list<' . $field_property_info['type'] . '>';
-            }
-
-            foreach ($bundles as $bundle_name) {
               $this->graph['entities']['cluster_entity_group_' . $entity_type]['entity_' . $entity_type . '__bundle_' . $bundle_name]['fields'][$field_name] = $field_property_info;
             }
           }
