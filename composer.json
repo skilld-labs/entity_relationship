@@ -1,5 +1,5 @@
 {
-  "name": "Entity relationship",
+  "name": "drupal/entity_relationship",
   "type": "drupal-module",
   "description": "Builds entity relationship graph to show project's structure",
   "keywords": ["Drupal", "graph"],
