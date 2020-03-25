@@ -279,12 +279,12 @@ class Diagram {
   }
 
   /**
-   * Draw a subgraph.
+   * Draw a sub-graph.
    *
    * @param string $name
    *   Name.
    * @param array $subgraph_info
-   *   Subgraph info.
+   *   Sub-graph info.
    *
    * @return string
    *   Graph expression.
