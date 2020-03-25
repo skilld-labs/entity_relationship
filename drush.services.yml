@@ -1,0 +1,6 @@
+services:
+  entity_relationship.commands:
+    class: Drupal\entity_relationship\Commands\DrushCommands
+    arguments: ['@entity_relationship.diagram']
+    tags:
+      - { name: drush.command }

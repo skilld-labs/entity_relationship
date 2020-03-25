@@ -8,5 +8,15 @@
     {
       "name": "Roman Nabiullin (nabiullin)"
     }
-  ]
+  ],
+  "require": {
+    "drupal/core": "^8.7.7 || ^9"
+  },
+  "extra": {
+    "drush": {
+      "services": {
+        "drush.services.yml": "^9"
+      }
+    }
+  }
 }
