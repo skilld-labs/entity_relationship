@@ -1,3 +1,5 @@
 name: 'Entity relationships diagram'
+description: Generates an entity relationship diagram for specified content entities.
 type: module
 core_version_requirement: ^8.7.7 || ^9
+configure: entity_relationship.form
