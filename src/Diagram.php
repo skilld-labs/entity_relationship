@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\entity_relationship;
+namespace Drupal\entity_relationship_diagram;
 
 use Drupal\Core\Entity\ContentEntityType;
 use Drupal\Core\Entity\EntityInterface;

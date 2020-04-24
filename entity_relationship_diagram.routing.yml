@@ -1,0 +1,15 @@
+entity_relationship_diagram.form:
+  path: '/admin/reports/entity-relationship-diagram'
+  defaults:
+    _form: '\Drupal\entity_relationship_diagram\Form\EntityRelationshipForm'
+    _title: 'Entity relations diagram'
+  requirements:
+    _permission: 'administer entity relationship diagram'
+
+entity_relationship_diagram.graph:
+  path: '/admin/reports/entity-relationship-diagram/diagram'
+  defaults:
+    _controller: '\Drupal\entity_relationship_diagram\Controller\DiagramController::content'
+    _title: 'Entity relations diagram'
+  requirements:
+    _permission: 'administer entity relationship diagram'

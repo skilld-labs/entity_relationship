@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\entity_relationship\Form;
+namespace Drupal\entity_relationship_diagram\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -42,7 +42,7 @@ class EntityRelationshipForm extends FormBase {
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'entity_relationship';
+    return 'entity_relationship_diagram';
   }
 
   /**
@@ -83,7 +83,7 @@ class EntityRelationshipForm extends FormBase {
         $chosen_entities[] = $entity;
       }
     }
-    $form_state->setRedirect('entity_relationship.graph', ['entities' => $chosen_entities]);
+    $form_state->setRedirect('entity_relationship_diagram.graph', ['entities' => $chosen_entities]);
   }
 
 }

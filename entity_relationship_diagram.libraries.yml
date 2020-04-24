@@ -8,11 +8,11 @@ viz.js:
   js:
     http://viz-js.com/bower_components/viz.js/viz.js: { type: external, minified: true }
 
-entity_relationship:
+entity_relationship_diagram:
   version: 1.0
   js:
-    entity_relationship.js: {}
+    entity_relationship_diagram.js: {}
   dependencies:
     - core/drupal
     - core/drupalSettings
-    - entity_relationship/viz.js
+    - entity_relationship_diagram/viz.js

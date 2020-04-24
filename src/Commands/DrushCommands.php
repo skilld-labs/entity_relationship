@@ -1,17 +1,17 @@
 <?php
 
-namespace Drupal\entity_relationship\Commands;
+namespace Drupal\entity_relationship_diagram\Commands;
 
 use Drush\Commands\DrushCommands as DrushCommandsBase;
-use Drupal\entity_relationship\Diagram;
+use Drupal\entity_relationship_diagram\Diagram;
 
 /**
- * Defines Drush commands for the entity_relationship module.
+ * Defines Drush commands for the entity_relationship_diagram module.
  */
 class DrushCommands extends DrushCommandsBase {
 
   /**
-   * @var \Drupal\entity_relationship\Diagram
+   * @var \Drupal\entity_relationship_diagram\Diagram
    */
   protected $diagram;
 
@@ -28,12 +28,12 @@ class DrushCommands extends DrushCommandsBase {
   /**
    * Entity relations diagram.
    *
-   * @command entity_relationship:diagram
+   * @command entity_relationship_diagram:diagram
    *
    * @option entity_type
    *   One or several entity types, separated by comma. Skipping this argument will output all content entities.
    *
-   * @usage drush entity_relationship:diagram --entity_type=xxx,xxx,xxx | dot -Gratio=0.7 -Eminlen=2 -T png -o ./output.png
+   * @usage drush entity_relationship_diagram:diagram --entity_type=xxx,xxx,xxx | dot -Gratio=0.7 -Eminlen=2 -T png -o ./output.png
    *   Output diagram for the specified entity types. Packages "graphviz" and "ttf-freefont" must be installed on your system.
    *
    * @aliases erdia
@@ -52,9 +52,9 @@ class DrushCommands extends DrushCommandsBase {
   /**
    * Available entities.
    *
-   * @command entity_relationship:show_entities
+   * @command entity_relationship_diagram:show_entities
    *
-   * @usage drush entity_relationship:show_entities
+   * @usage drush entity_relationship_diagram:show_entities
    *   Output a list of available entities.
    *
    * @aliases ersen

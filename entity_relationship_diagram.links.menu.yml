@@ -1,5 +1,5 @@
-entity_relationship.form_page:
-  title: Entity relation diagram
-  route_name: entity_relationship.form
+entity_relationship_diagram.form_page:
+  title: Entity relationship diagram
+  route_name: entity_relationship_diagram.form
   parent: system.admin_config_workflow
   description: 'Generates an entity relationship diagram for specified content entities.'
