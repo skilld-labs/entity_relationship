@@ -1,9 +1,9 @@
 # Entity relationship diagram
 This module generates entity relationship diagram for chosen content entities.
-This module was ported from Drupal 7 [entitiesdiagram](https://github.com/Gizra/entitiesdiagram) with my improvement.
+This module was originally ported from Drupal 7 [entitiesdiagram](https://github.com/Gizra/entitiesdiagram) with several improvements.
 
 # Usage
-Go to `/admin/reports/diagram` to see form with available content entity types.
+Go to `/admin/reports/entity-relationship-diagram` to see form with available content entity types.
 Mark necessary for you entity types and press on create button.
 
 Generates a graph in the PNG format.
@@ -14,8 +14,8 @@ Generates a graph in the PNG format.
 Optionally, if you install CLI package "graphviz" (Alpine Linux users could also need package "ttf-freefont"), you can to output diagram
 as an image file, by executing following drush command:
 
-drush entity_relationship:diagram | dot -Gratio=0.7 -Eminlen=2 -T png -o ./output.png
+drush entity_relationship_diagram:diagram | dot -Gratio=0.7 -Eminlen=2 -T png -o ./output.png
 
 It is also possible to specify desired entity types:
 
-drush entity_relationship:diagram --entity_type=node,user,taxonomy_term | dot -Gratio=0.7 -Eminlen=2 -T png -o ./output.png
+drush entity_relationship_diagram:diagram --entity_type=node,user,taxonomy_term | dot -Gratio=0.7 -Eminlen=2 -T png -o ./output.png

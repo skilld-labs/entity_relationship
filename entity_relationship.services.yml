@@ -1,4 +1,0 @@
-services:
-  entity_relationship.diagram:
-    class: Drupal\entity_relationship\Diagram
-    arguments: [ '@entity_type.manager', '@entity_field.manager' ]
