@@ -1,3 +1,10 @@
+
+# Deprecation notice
+
+This module has been moved to https://www.drupal.org/project/entity_relationship_diagram
+
+Do not use this repo anymore
+
 # Entity relationship diagram
 This module generates entity relationship diagram for chosen content entities.
 This module was originally ported from Drupal 7 [entitiesdiagram](https://github.com/Gizra/entitiesdiagram) with several improvements.
